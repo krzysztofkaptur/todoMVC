@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+	"strconv"
+)
+
+type apiFunc func(http.ResponseWriter, *http.Request) error
 
 func main() {
-	fmt.Println("init")
+	server := ApiServer{
+		addr: strconv.Itoa(80),
+	}
+
+	server.Run()
 }
