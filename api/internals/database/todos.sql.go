@@ -9,6 +9,15 @@ import (
 	"context"
 )
 
+const createTodo = `-- name: CreateTodo :exec
+insert into todos (text) values ($1)
+`
+
+func (q *Queries) CreateTodo(ctx context.Context, text string) error {
+	_, err := q.db.ExecContext(ctx, createTodo, text)
+	return err
+}
+
 const fetchTodos = `-- name: FetchTodos :many
 select id, text, completed from todos
 `
