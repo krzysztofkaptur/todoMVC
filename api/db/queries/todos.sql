@@ -1,6 +1,9 @@
 -- name: FetchTodos :many
 select * from todos;
 
+-- name: FetchTodo :one
+select * from todos where id=$1;
+
 -- name: CreateTodo :exec
 insert into todos (text) values ($1);
 

@@ -27,6 +27,17 @@ func (q *Queries) DeleteTodo(ctx context.Context, id int32) error {
 	return err
 }
 
+const fetchTodo = `-- name: FetchTodo :one
+select id, text, completed from todos where id=$1
+`
+
+func (q *Queries) FetchTodo(ctx context.Context, id int32) (Todo, error) {
+	row := q.db.QueryRowContext(ctx, fetchTodo, id)
+	var i Todo
+	err := row.Scan(&i.ID, &i.Text, &i.Completed)
+	return i, err
+}
+
 const fetchTodos = `-- name: FetchTodos :many
 select id, text, completed from todos
 `
@@ -59,9 +70,9 @@ update todos set text=coalesce($2, text), completed=coalesce($3, completed) wher
 `
 
 type UpdateTodoParams struct {
-	ID        int32
-	Text      string
-	Completed bool
+	ID        int32  `json:"id"`
+	Text      string `json:"text"`
+	Completed bool   `json:"completed"`
 }
 
 func (q *Queries) UpdateTodo(ctx context.Context, arg UpdateTodoParams) error {
