@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type ApiServer struct {
@@ -37,6 +38,7 @@ func (server *ApiServer) Run() {
 	// todos
 	router.HandleFunc(createUrl(http.MethodGet, "/todos"), makeHTTPHandleFunc(server.handleFetchTodos))
 	router.HandleFunc(createUrl(http.MethodPost, "/todos"), makeHTTPHandleFunc(server.handleCreateTodo))
+	router.HandleFunc(createUrl(http.MethodDelete, "/todos/{id}"), makeHTTPHandleFunc(server.handleDeleteTodo))
 
 	http.ListenAndServe(":"+server.addr, router)
 }
@@ -90,5 +92,26 @@ func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request
 
 	return WriteJSON(w, http.StatusCreated, ApiGenericResponse{
 		Message: "todo created",
+	})
+}
+
+func (server *ApiServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request) error {
+	strId := r.PathValue("id")
+	str, err := strconv.Atoi(strId)
+	if err != nil {
+		WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	err = server.store.DB.DeleteTodo(r.Context(), int32(str))
+	if err != nil {
+		WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	return WriteJSON(w, http.StatusOK, ApiGenericResponse{
+		Message: "todo deleted",
 	})
 }
