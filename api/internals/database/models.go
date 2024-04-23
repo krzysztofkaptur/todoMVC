@@ -4,12 +4,10 @@
 
 package database
 
-import (
-	"database/sql"
-)
+import ()
 
 type Todo struct {
 	ID        int32
 	Text      string
-	Completed sql.NullBool
+	Completed bool
 }

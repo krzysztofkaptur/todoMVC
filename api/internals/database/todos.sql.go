@@ -53,3 +53,18 @@ func (q *Queries) FetchTodos(ctx context.Context) ([]Todo, error) {
 	}
 	return items, nil
 }
+
+const updateTodo = `-- name: UpdateTodo :exec
+update todos set text=coalesce($2, text), completed=coalesce($3, completed) where id=$1
+`
+
+type UpdateTodoParams struct {
+	ID        int32
+	Text      string
+	Completed bool
+}
+
+func (q *Queries) UpdateTodo(ctx context.Context, arg UpdateTodoParams) error {
+	_, err := q.db.ExecContext(ctx, updateTodo, arg.ID, arg.Text, arg.Completed)
+	return err
+}

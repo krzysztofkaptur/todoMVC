@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/krzysztofkaptur/todoMVC/internals/database"
 )
 
 type ApiServer struct {
@@ -39,6 +41,7 @@ func (server *ApiServer) Run() {
 	router.HandleFunc(createUrl(http.MethodGet, "/todos"), makeHTTPHandleFunc(server.handleFetchTodos))
 	router.HandleFunc(createUrl(http.MethodPost, "/todos"), makeHTTPHandleFunc(server.handleCreateTodo))
 	router.HandleFunc(createUrl(http.MethodDelete, "/todos/{id}"), makeHTTPHandleFunc(server.handleDeleteTodo))
+	router.HandleFunc(createUrl(http.MethodPatch, "/todos/{id}"), makeHTTPHandleFunc(server.handleUpdateTodo))
 
 	http.ListenAndServe(":"+server.addr, router)
 }
@@ -61,7 +64,7 @@ func (server *ApiServer) handleHealthCheck(w http.ResponseWriter, r *http.Reques
 func (server *ApiServer) handleFetchTodos(w http.ResponseWriter, r *http.Request) error {
 	todos, err := server.store.DB.FetchTodos(r.Context())
 	if err != nil {
-		WriteJSON(w, http.StatusBadRequest, ApiError{
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Message: "something went wrong",
 		})
 	}
@@ -78,14 +81,14 @@ func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request
 
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
-		WriteJSON(w, http.StatusBadRequest, ApiError{
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Message: "something went wrong",
 		})
 	}
 
 	err = server.store.DB.CreateTodo(r.Context(), params.Text)
 	if err != nil {
-		WriteJSON(w, http.StatusBadRequest, ApiError{
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Message: "something went wrong",
 		})
 	}
@@ -96,17 +99,16 @@ func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request
 }
 
 func (server *ApiServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request) error {
-	strId := r.PathValue("id")
-	str, err := strconv.Atoi(strId)
+	id, err := getId(r)
 	if err != nil {
-		WriteJSON(w, http.StatusBadRequest, ApiError{
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Message: "something went wrong",
 		})
 	}
 
-	err = server.store.DB.DeleteTodo(r.Context(), int32(str))
+	err = server.store.DB.DeleteTodo(r.Context(), id)
 	if err != nil {
-		WriteJSON(w, http.StatusBadRequest, ApiError{
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Message: "something went wrong",
 		})
 	}
@@ -114,4 +116,48 @@ func (server *ApiServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request
 	return WriteJSON(w, http.StatusOK, ApiGenericResponse{
 		Message: "todo deleted",
 	})
+}
+
+func (server *ApiServer) handleUpdateTodo(w http.ResponseWriter, r *http.Request) error {
+	id, err := getId(r)
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	type parameters struct {
+		Text      string `json:"text"`
+		Completed bool   `json:"completed"`
+	}
+
+	params := parameters{}
+
+	err = json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	err = server.store.DB.UpdateTodo(r.Context(), database.UpdateTodoParams{ID: id, Text: params.Text, Completed: params.Completed})
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	return WriteJSON(w, http.StatusOK, ApiGenericResponse{
+		Message: "todo updated",
+	})
+}
+
+func getId(r *http.Request) (int32, error) {
+	strId := r.PathValue("id")
+	str, err := strconv.Atoi(strId)
+	if err != nil {
+		return 0, err
+	}
+
+	return int32(str), nil
 }
