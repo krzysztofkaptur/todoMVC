@@ -42,6 +42,7 @@ func (server *ApiServer) Run() {
 	router.HandleFunc(createUrl(http.MethodPost, "/todos"), makeHTTPHandleFunc(server.handleCreateTodo))
 	router.HandleFunc(createUrl(http.MethodDelete, "/todos/{id}"), makeHTTPHandleFunc(server.handleDeleteTodo))
 	router.HandleFunc(createUrl(http.MethodPatch, "/todos/{id}"), makeHTTPHandleFunc(server.handleUpdateTodo))
+	router.HandleFunc(createUrl(http.MethodGet, "/todos/{id}"), makeHTTPHandleFunc(server.handleFetchTodoById))
 
 	http.ListenAndServe(":"+server.addr, router)
 }
@@ -150,6 +151,24 @@ func (server *ApiServer) handleUpdateTodo(w http.ResponseWriter, r *http.Request
 	return WriteJSON(w, http.StatusOK, ApiGenericResponse{
 		Message: "todo updated",
 	})
+}
+
+func (server *ApiServer) handleFetchTodoById(w http.ResponseWriter, r *http.Request) error {
+	id, err := getId(r)
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	todo, err := server.store.DB.FetchTodo(r.Context(), id)
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	return WriteJSON(w, http.StatusOK, todo)
 }
 
 func getId(r *http.Request) (int32, error) {
