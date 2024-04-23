@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -31,10 +32,11 @@ func (server *ApiServer) Run() {
 	router := http.NewServeMux()
 
 	// health check
-	router.HandleFunc(createUrl("GET", "/healthcheck"), makeHTTPHandleFunc(server.handleHealthCheck))
+	router.HandleFunc(createUrl(http.MethodGet, "/healthcheck"), makeHTTPHandleFunc(server.handleHealthCheck))
 
 	// todos
-	router.HandleFunc(createUrl("GET", "/todos"), makeHTTPHandleFunc(server.handleFetchTodos))
+	router.HandleFunc(createUrl(http.MethodGet, "/todos"), makeHTTPHandleFunc(server.handleFetchTodos))
+	router.HandleFunc(createUrl(http.MethodPost, "/todos"), makeHTTPHandleFunc(server.handleCreateTodo))
 
 	http.ListenAndServe(":"+server.addr, router)
 }
@@ -63,4 +65,30 @@ func (server *ApiServer) handleFetchTodos(w http.ResponseWriter, r *http.Request
 	}
 
 	return WriteJSON(w, http.StatusOK, todos)
+}
+
+func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request) error {
+	type parameters struct {
+		Text string `json:"text"`
+	}
+
+	params := parameters{}
+
+	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	err = server.store.DB.CreateTodo(r.Context(), params.Text)
+	if err != nil {
+		WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	return WriteJSON(w, http.StatusCreated, ApiGenericResponse{
+		Message: "todo created",
+	})
 }
