@@ -1,9 +1,13 @@
 package main
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 type ApiServer struct {
-	addr string
+	addr  string
+	store ApiConfig
 }
 
 type ApiError struct {
@@ -11,10 +15,26 @@ type ApiError struct {
 	Code    string `json:"code"`
 }
 
+type ApiGenericResponse struct {
+	Message string `json:"message"`
+}
+
+const (
+	BASE_URL = "/api/v1"
+)
+
+func createUrl(method string, path string) string {
+	return fmt.Sprintf("%v %v%v", method, BASE_URL, path)
+}
+
 func (server *ApiServer) Run() {
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /api/v1/healthcheck", makeHTTPHandleFunc(server.handleHealthCheck))
+	// health check
+	router.HandleFunc(createUrl("GET", "/healthcheck"), makeHTTPHandleFunc(server.handleHealthCheck))
+
+	// todos
+	router.HandleFunc(createUrl("GET", "/todos"), makeHTTPHandleFunc(server.handleFetchTodos))
 
 	http.ListenAndServe(":"+server.addr, router)
 }
@@ -31,5 +51,16 @@ func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
 }
 
 func (server *ApiServer) handleHealthCheck(w http.ResponseWriter, r *http.Request) error {
-	return WriteJSON(w, http.StatusOK, struct{ Message string }{Message: "healthCheck"})
+	return WriteJSON(w, http.StatusOK, ApiGenericResponse{Message: "healthCheck"})
+}
+
+func (server *ApiServer) handleFetchTodos(w http.ResponseWriter, r *http.Request) error {
+	todos, err := server.store.DB.FetchTodos(r.Context())
+	if err != nil {
+		WriteJSON(w, http.StatusBadRequest, ApiError{
+			Message: "something went wrong",
+		})
+	}
+
+	return WriteJSON(w, http.StatusOK, todos)
 }
