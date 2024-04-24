@@ -4,7 +4,7 @@ type Props = {
   todo: Todo;
 };
 
-export const TodoItem = ({ todo }: Props): JSX.Element => {
+export const TodoItem = ({ todo }: Props) => {
   return (
     <article className="m-4 flex justify-between gap-4 p-4">
       <div className="flex gap-4">

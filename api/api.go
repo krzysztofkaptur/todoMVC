@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/krzysztofkaptur/todoMVC/internals/database"
+	"github.com/rs/cors"
 )
 
 type ApiServer struct {
@@ -31,8 +32,13 @@ func createUrl(method string, path string) string {
 	return fmt.Sprintf("%v %v%v", method, BASE_URL, path)
 }
 
+// cors.Default() setup the middleware with default options being
+// all origins accepted with simple methods (GET, POST). See
+// documentation below for more options.
+
 func (server *ApiServer) Run() {
 	router := http.NewServeMux()
+	handler := cors.Default().Handler(router)
 
 	// health check
 	router.HandleFunc(createUrl(http.MethodGet, "/healthcheck"), makeHTTPHandleFunc(server.handleHealthCheck))
@@ -44,7 +50,7 @@ func (server *ApiServer) Run() {
 	router.HandleFunc(createUrl(http.MethodPatch, "/todos/{id}"), makeHTTPHandleFunc(server.handleUpdateTodo))
 	router.HandleFunc(createUrl(http.MethodGet, "/todos/{id}"), makeHTTPHandleFunc(server.handleFetchTodoById))
 
-	http.ListenAndServe(":"+server.addr, router)
+	http.ListenAndServe(":"+server.addr, handler)
 }
 
 func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
