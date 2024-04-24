@@ -38,7 +38,11 @@ func createUrl(method string, path string) string {
 
 func (server *ApiServer) Run() {
 	router := http.NewServeMux()
-	handler := cors.Default().Handler(router)
+	handler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete},
+		AllowCredentials: true,
+	}).Handler(router)
 
 	// health check
 	router.HandleFunc(createUrl(http.MethodGet, "/healthcheck"), makeHTTPHandleFunc(server.handleHealthCheck))
