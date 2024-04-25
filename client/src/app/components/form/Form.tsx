@@ -1,34 +1,32 @@
 "use client";
 
-import { FormEvent, ReactNode, useRef } from "react";
-import { createTodo } from "@/app/services/todos";
-
+import { useRef } from "react";
+import { FieldValues, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-type Props = {
-  children: ReactNode;
-};
+import { Input } from "@/app/components/input";
+import { createTodo } from "@/app/services/todos";
 
-export const Form = ({ children }: Props) => {
+export const Form = () => {
   const ref = useRef<HTMLFormElement>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const { handleSubmit, register } = useForm();
 
-    var formData = new FormData(ref.current as HTMLFormElement);
-
+  const onSubmit = async (values: FieldValues) => {
     await createTodo({
-      text: formData.get("text") as string,
+      text: values.text,
       completed: false,
     });
+    ref.current!.reset();
 
     router.refresh();
   };
 
   return (
-    <form ref={ref} onSubmit={handleSubmit}>
-      {children}
+    <form ref={ref} onSubmit={handleSubmit(onSubmit)}>
+      <Input {...register("text")} />
+      <button type="submit">Add</button>
     </form>
   );
 };

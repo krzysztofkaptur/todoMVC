@@ -1,17 +1,22 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { Ref, forwardRef } from "react";
+import { ChangeHandler } from "react-hook-form";
 
-export const Input = () => {
-  const [value, setValue] = useState("");
+type Props = {
+  name: string;
+  onChange: ChangeHandler;
+};
 
+export const Input = forwardRef((props: Props, ref: Ref<HTMLInputElement>) => {
   return (
     <input
+      ref={ref}
       type="text"
-      value={value}
-      name="text"
+      id="text"
+      name={props.name}
       className="text-black"
-      onInput={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+      onInput={props.onChange}
     />
   );
-};
+});
