@@ -39,7 +39,7 @@ func (q *Queries) FetchTodo(ctx context.Context, id int32) (Todo, error) {
 }
 
 const fetchTodos = `-- name: FetchTodos :many
-select id, text, completed from todos
+select id, text, completed from todos order by id desc
 `
 
 func (q *Queries) FetchTodos(ctx context.Context) ([]Todo, error) {

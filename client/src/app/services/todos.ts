@@ -15,3 +15,9 @@ export const deleteTodo = (id: number) =>
   fetch(`${baseURL}/todos/${id}`, {
     method: "DELETE",
   });
+
+export const updateTodo = (id: number, body: Omit<Todo, "id">) =>
+  fetch(`${baseURL}/todos/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });

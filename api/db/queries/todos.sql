@@ -1,5 +1,5 @@
 -- name: FetchTodos :many
-select * from todos;
+select * from todos order by id desc;
 
 -- name: FetchTodo :one
 select * from todos where id=$1;

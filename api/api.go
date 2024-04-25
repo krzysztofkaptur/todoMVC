@@ -40,7 +40,7 @@ func (server *ApiServer) Run() {
 	router := http.NewServeMux()
 	handler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete},
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch},
 		AllowCredentials: true,
 	}).Handler(router)
 
