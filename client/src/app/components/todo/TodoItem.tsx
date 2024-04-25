@@ -1,9 +1,13 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { useState, useEffect } from "react";
+import { FieldValues, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { deleteTodo, updateTodo } from "@/app/services/todos";
+import { addTodoSchema } from "@/app/libs/validation";
+import { Input } from "@/app/components/input";
 
 import type { Todo } from "./types";
 
@@ -14,7 +18,15 @@ type Props = {
 export const TodoItem = ({ todo }: Props) => {
   const router = useRouter();
   const [editMode, setEditMode] = useState(false);
-  const [value, setValue] = useState(todo.text || "");
+
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(addTodoSchema),
+  });
 
   const handleDelete = async () => {
     try {
@@ -30,12 +42,10 @@ export const TodoItem = ({ todo }: Props) => {
     setEditMode(value);
   };
 
-  const handleUpdate = async (e: FormEvent) => {
-    e.preventDefault();
-
+  const handleUpdate = handleSubmit(async (values: FieldValues) => {
     try {
       await updateTodo(todo.id, {
-        text: value,
+        text: values.text,
         completed: todo.completed,
       });
 
@@ -45,7 +55,7 @@ export const TodoItem = ({ todo }: Props) => {
     } catch (err) {
       console.log(err);
     }
-  };
+  });
 
   const handleCheckbox = async () => {
     try {
@@ -60,6 +70,12 @@ export const TodoItem = ({ todo }: Props) => {
     }
   };
 
+  useEffect(() => {
+    if (todo.id) {
+      setValue("text", todo.text);
+    }
+  }, [todo, setValue]);
+
   return (
     <article>
       {editMode ? (
@@ -69,14 +85,7 @@ export const TodoItem = ({ todo }: Props) => {
         >
           <div className="flex gap-4">
             <input type="checkbox" disabled checked={todo.completed} />
-            <input
-              type="text"
-              className="text-black"
-              value={value}
-              onInput={(e: ChangeEvent<HTMLInputElement>) =>
-                setValue(e.target.value)
-              }
-            />
+            <Input {...register("text")} error={errors.text?.message} />
           </div>
           <div className="flex gap-4">
             <button type="button" onClick={() => handleEditMode(false)}>
