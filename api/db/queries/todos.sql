@@ -5,7 +5,7 @@ select * from todos order by id desc;
 select * from todos where id=$1;
 
 -- name: CreateTodo :exec
-insert into todos (text) values ($1);
+insert into todos (text, author_id) values ($1, $2);
 
 -- name: DeleteTodo :exec
 delete from todos where id=$1;

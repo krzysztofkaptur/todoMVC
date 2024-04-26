@@ -10,4 +10,11 @@ type Todo struct {
 	ID        int32  `json:"id"`
 	Text      string `json:"text"`
 	Completed bool   `json:"completed"`
+	AuthorID  int32  `json:"author_id"`
+}
+
+type User struct {
+	ID       int32  `json:"id"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

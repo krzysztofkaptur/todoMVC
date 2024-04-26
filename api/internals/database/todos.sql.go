@@ -10,11 +10,16 @@ import (
 )
 
 const createTodo = `-- name: CreateTodo :exec
-insert into todos (text) values ($1)
+insert into todos (text, author_id) values ($1, $2)
 `
 
-func (q *Queries) CreateTodo(ctx context.Context, text string) error {
-	_, err := q.db.ExecContext(ctx, createTodo, text)
+type CreateTodoParams struct {
+	Text     string `json:"text"`
+	AuthorID int32  `json:"author_id"`
+}
+
+func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) error {
+	_, err := q.db.ExecContext(ctx, createTodo, arg.Text, arg.AuthorID)
 	return err
 }
 
@@ -28,18 +33,23 @@ func (q *Queries) DeleteTodo(ctx context.Context, id int32) error {
 }
 
 const fetchTodo = `-- name: FetchTodo :one
-select id, text, completed from todos where id=$1
+select id, text, completed, author_id from todos where id=$1
 `
 
 func (q *Queries) FetchTodo(ctx context.Context, id int32) (Todo, error) {
 	row := q.db.QueryRowContext(ctx, fetchTodo, id)
 	var i Todo
-	err := row.Scan(&i.ID, &i.Text, &i.Completed)
+	err := row.Scan(
+		&i.ID,
+		&i.Text,
+		&i.Completed,
+		&i.AuthorID,
+	)
 	return i, err
 }
 
 const fetchTodos = `-- name: FetchTodos :many
-select id, text, completed from todos order by id desc
+select id, text, completed, author_id from todos order by id desc
 `
 
 func (q *Queries) FetchTodos(ctx context.Context) ([]Todo, error) {
@@ -51,7 +61,12 @@ func (q *Queries) FetchTodos(ctx context.Context) ([]Todo, error) {
 	var items []Todo
 	for rows.Next() {
 		var i Todo
-		if err := rows.Scan(&i.ID, &i.Text, &i.Completed); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Text,
+			&i.Completed,
+			&i.AuthorID,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
