@@ -7,7 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { deleteTodo, updateTodo } from "@/app/services/todos";
 import { addTodoSchema } from "@/app/libs/validation";
-import { Input } from "@/app/components/input";
+import { Button } from "@/app/components/button";
+import { InputGroup } from "@/app/components/inputGroup";
+import { Form } from "@/app/components/form";
 
 import type { Todo } from "./types";
 
@@ -79,21 +81,22 @@ export const TodoItem = ({ todo }: Props) => {
   return (
     <article>
       {editMode ? (
-        <form
+        <Form
           onSubmit={handleUpdate}
           className="m-4 flex justify-between gap-4 p-4"
         >
           <div className="flex gap-4">
             <input type="checkbox" disabled checked={todo.completed} />
-            <Input {...register("text")} error={errors.text?.message} />
+            <InputGroup
+              {...register("text")}
+              error={errors.text?.message as string}
+            />
           </div>
           <div className="flex gap-4">
-            <button type="button" onClick={() => handleEditMode(false)}>
-              Cancel
-            </button>
-            <button type="submit">Save</button>
+            <Button onClick={() => handleEditMode(false)}>Cancel</Button>
+            <Button type="submit">Save</Button>
           </div>
-        </form>
+        </Form>
       ) : (
         <div className="m-4 flex justify-between gap-4 p-4">
           <div className="flex gap-4">
@@ -105,8 +108,8 @@ export const TodoItem = ({ todo }: Props) => {
             <span>{todo.text}</span>
           </div>
           <div className="flex gap-4">
-            <button onClick={() => handleEditMode(true)}>Edit</button>
-            <button onClick={handleDelete}>Delete</button>
+            <Button onClick={() => handleEditMode(true)}>Edit</Button>
+            <Button onClick={handleDelete}>Delete</Button>
           </div>
         </div>
       )}

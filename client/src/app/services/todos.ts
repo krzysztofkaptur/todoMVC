@@ -1,6 +1,6 @@
-import { CreateTodo, Todo } from "@/app/components/todo/types";
+import { CreateTodo } from "@/app/components/todo/types";
 
-const baseURL = "http://host.docker.internal/api/v1";
+import { baseURL } from "@/app/services/config";
 
 export const fetchTodos = () =>
   fetch(`${baseURL}/todos`).then((res) => res.json());

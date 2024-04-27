@@ -1,28 +1,26 @@
 "use client";
 
-import { Ref, forwardRef } from "react";
+import { HTMLInputTypeAttribute, Ref, forwardRef } from "react";
 import { ChangeHandler } from "react-hook-form";
 
 type Props = {
+  id?: string;
   name: string;
-  onChange: ChangeHandler;
-  error: any;
+  type?: HTMLInputTypeAttribute;
+  onChange?: ChangeHandler;
 };
 
-export const Input = forwardRef((props: Props, ref: Ref<HTMLInputElement>) => {
-  const { name, error, onChange } = props;
+export const Input = forwardRef((props: Props, ref?: Ref<HTMLInputElement>) => {
+  const { id, name, type = "text", onChange } = props;
 
   return (
-    <div className="flex flex-col">
-      <input
-        ref={ref}
-        type="text"
-        id="text"
-        name={name}
-        className="text-black"
-        onInput={onChange}
-      />
-      {error && <span>{error}</span>}
-    </div>
+    <input
+      ref={ref}
+      id={id ?? name}
+      name={name ?? id}
+      className="text-black"
+      type={type}
+      onInput={onChange}
+    />
   );
 });

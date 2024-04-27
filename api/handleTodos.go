@@ -20,8 +20,7 @@ func (server *ApiServer) handleFetchTodos(w http.ResponseWriter, r *http.Request
 
 func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request) error {
 	type parameters struct {
-		Text     string `json:"text"`
-		AuthorID int32  `json:"author_id"`
+		Text string `json:"text"`
 	}
 
 	params := parameters{}
@@ -33,7 +32,8 @@ func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request
 		})
 	}
 
-	err = server.store.DB.CreateTodo(r.Context(), database.CreateTodoParams{Text: params.Text, AuthorID: params.AuthorID})
+	// todo: get AuthorID from token
+	err = server.store.DB.CreateTodo(r.Context(), database.CreateTodoParams{Text: params.Text, AuthorID: 1})
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Message: "something went wrong",

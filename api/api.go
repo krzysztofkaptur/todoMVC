@@ -47,7 +47,7 @@ func (server *ApiServer) Run() {
 	router.HandleFunc(createUrl(http.MethodGet, "/todos/{id}"), makeHTTPHandleFunc(server.handleFetchTodoById))
 
 	// auth
-	router.HandleFunc(createUrl(http.MethodPost, "/register"), makeHTTPHandleFunc(server.handleUserRegister))
+	router.HandleFunc(createUrl(http.MethodPost, "/auth/register"), makeHTTPHandleFunc(server.handleUserRegister))
 
 	http.ListenAndServe(":"+server.addr, handler)
 }
@@ -55,4 +55,3 @@ func (server *ApiServer) Run() {
 func (server *ApiServer) handleHealthCheck(w http.ResponseWriter, r *http.Request) error {
 	return WriteJSON(w, http.StatusOK, ApiGenericResponse{Message: "healthCheck"})
 }
-
