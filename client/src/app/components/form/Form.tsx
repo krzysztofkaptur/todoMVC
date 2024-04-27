@@ -9,7 +9,7 @@ type Props = {
 };
 
 export const Form = (props: Props) => {
-  const { children, className, onSubmit } = props;
+  const { children, className = "", onSubmit } = props;
 
   return (
     <form onSubmit={onSubmit} className={`align-start flex gap-4 ${className}`}>

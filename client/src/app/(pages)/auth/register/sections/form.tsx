@@ -35,7 +35,7 @@ export const RegisterForm = () => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit} className="flex flex-col">
       <InputGroup
         label="Email"
         error={errors.email?.message as string}
