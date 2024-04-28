@@ -3,32 +3,31 @@
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { registerUser } from "@/app/services/auth";
+import { loginUser } from "@/app/services/auth";
 import { Button } from "@/app/components/button";
-import { registerSchema } from "@/app/libs/validation";
+import { loginSchema } from "@/app/libs/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/app/components/form";
 import { InputGroup } from "@/app/components/inputGroup";
 
-export const RegisterForm = () => {
+export const LoginForm = () => {
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(loginSchema),
   });
   const router = useRouter();
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await registerUser({
+      await loginUser({
         email: values.email,
         password: values.password,
       });
 
-      // todo: navigate to login
-      router.push("/auth/login");
+      router.push("/");
     } catch (err) {
       console.log(err);
     }
@@ -50,7 +49,7 @@ export const RegisterForm = () => {
         type="password"
         {...register("password")}
       />
-      <Button type="submit">Register</Button>
+      <Button type="submit">Login</Button>
     </Form>
   );
 };

@@ -13,3 +13,9 @@ export const registerSchema = z.object({
   // todo: add better validation
   password: z.string().min(3),
 });
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+  // todo: add better validation
+  password: z.string().min(3),
+});
