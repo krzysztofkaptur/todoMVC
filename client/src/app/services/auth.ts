@@ -1,4 +1,4 @@
-import { baseURL } from "@/app/services/config";
+import { baseURL } from "@/app/config/defaults";
 
 type RegisterUserBody = {
   email: string;

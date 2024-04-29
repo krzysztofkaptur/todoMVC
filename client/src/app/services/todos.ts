@@ -1,6 +1,6 @@
 import { CreateTodo } from "@/app/components/todo/types";
 
-import { baseURL } from "@/app/services/config";
+import { baseURL } from "@/app/config/defaults";
 
 export const fetchTodos = () =>
   fetch(`${baseURL}/todos`).then((res) => res.json());

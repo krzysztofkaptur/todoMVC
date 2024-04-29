@@ -1,5 +1,5 @@
 -- name: FetchTodos :many
-select * from todos order by id desc;
+select * from todos where author_id=$1 order by id desc;
 
 -- name: FetchTodo :one
 select * from todos where id=$1;
