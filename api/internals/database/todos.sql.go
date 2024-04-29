@@ -49,11 +49,11 @@ func (q *Queries) FetchTodo(ctx context.Context, id int32) (Todo, error) {
 }
 
 const fetchTodos = `-- name: FetchTodos :many
-select id, text, completed, author_id from todos order by id desc
+select id, text, completed, author_id from todos where author_id=$1 order by id desc
 `
 
-func (q *Queries) FetchTodos(ctx context.Context) ([]Todo, error) {
-	rows, err := q.db.QueryContext(ctx, fetchTodos)
+func (q *Queries) FetchTodos(ctx context.Context, authorID int32) ([]Todo, error) {
+	rows, err := q.db.QueryContext(ctx, fetchTodos, authorID)
 	if err != nil {
 		return nil, err
 	}

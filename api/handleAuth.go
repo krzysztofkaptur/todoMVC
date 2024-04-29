@@ -73,12 +73,20 @@ func (server *ApiServer) handleUserLogin(w http.ResponseWriter, r *http.Request)
 		})
 	}
 
-	type loginResponse struct {
-		AccessToken string `json:"access_token"`
+	cookie := http.Cookie{
+		Name:     "accessToken",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   86400,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	}
 
-	return WriteJSON(w, http.StatusOK, loginResponse{
-		AccessToken: token,
+	http.SetCookie(w, &cookie)
+
+	return WriteJSON(w, http.StatusOK, ApiGenericResponse{
+		Message: "loged in successfully",
 	})
 }
 

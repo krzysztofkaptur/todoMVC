@@ -31,7 +31,7 @@ const (
 func (server *ApiServer) Run() {
 	router := http.NewServeMux()
 	handler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch},
 		AllowCredentials: true,
 	}).Handler(router)
@@ -40,11 +40,11 @@ func (server *ApiServer) Run() {
 	router.HandleFunc(createUrl(http.MethodGet, "/healthcheck"), makeHTTPHandleFunc(server.handleHealthCheck))
 
 	// todos
-	router.HandleFunc(createUrl(http.MethodGet, "/todos"), makeHTTPHandleFunc(server.handleFetchTodos))
-	router.HandleFunc(createUrl(http.MethodPost, "/todos"), makeHTTPHandleFunc(server.handleCreateTodo))
-	router.HandleFunc(createUrl(http.MethodDelete, "/todos/{id}"), makeHTTPHandleFunc(server.handleDeleteTodo))
-	router.HandleFunc(createUrl(http.MethodPatch, "/todos/{id}"), makeHTTPHandleFunc(server.handleUpdateTodo))
-	router.HandleFunc(createUrl(http.MethodGet, "/todos/{id}"), makeHTTPHandleFunc(server.handleFetchTodoById))
+	router.HandleFunc(createUrl(http.MethodGet, "/todos"), authMiddleware(makeHTTPHandleFunc(server.handleFetchTodos)))
+	router.HandleFunc(createUrl(http.MethodPost, "/todos"), authMiddleware(makeHTTPHandleFunc(server.handleCreateTodo)))
+	router.HandleFunc(createUrl(http.MethodDelete, "/todos/{id}"), authMiddleware(makeHTTPHandleFunc(server.handleDeleteTodo)))
+	router.HandleFunc(createUrl(http.MethodPatch, "/todos/{id}"), authMiddleware(makeHTTPHandleFunc(server.handleUpdateTodo)))
+	router.HandleFunc(createUrl(http.MethodGet, "/todos/{id}"), authMiddleware(makeHTTPHandleFunc(server.handleFetchTodoById)))
 
 	// auth
 	router.HandleFunc(createUrl(http.MethodPost, "/auth/register"), makeHTTPHandleFunc(server.handleUserRegister))

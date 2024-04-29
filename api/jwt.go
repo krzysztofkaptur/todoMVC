@@ -45,9 +45,12 @@ func VerifyJWT(tokenString string) (*jwt.Token, error) {
 }
 
 func GetUserIdFromToken(r *http.Request) (int, error) {
-	authToken := r.Header.Get("authorization")
+	authToken, err := r.Cookie("accessToken")
+	if err != nil {
+		return 0, fmt.Errorf("token problem")
+	}
 
-	token, err := VerifyJWT(authToken)
+	token, err := VerifyJWT(authToken.Value)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err

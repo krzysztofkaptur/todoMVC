@@ -8,7 +8,9 @@ import (
 )
 
 func (server *ApiServer) handleFetchTodos(w http.ResponseWriter, r *http.Request) error {
-	todos, err := server.store.DB.FetchTodos(r.Context())
+	userId := getUserIdFromContext(r)
+
+	todos, err := server.store.DB.FetchTodos(r.Context(), int32(userId))
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Error: "something went wrong",
@@ -19,6 +21,7 @@ func (server *ApiServer) handleFetchTodos(w http.ResponseWriter, r *http.Request
 }
 
 func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request) error {
+	userId := getUserIdFromContext(r)
 	type parameters struct {
 		Text string `json:"text"`
 	}
@@ -32,8 +35,7 @@ func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request
 		})
 	}
 
-	// todo: get AuthorID from token
-	err = server.store.DB.CreateTodo(r.Context(), database.CreateTodoParams{Text: params.Text, AuthorID: 1})
+	err = server.store.DB.CreateTodo(r.Context(), database.CreateTodoParams{Text: params.Text, AuthorID: int32(userId)})
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Error: "something went wrong",
@@ -46,10 +48,25 @@ func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request
 }
 
 func (server *ApiServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request) error {
+	userId := getUserIdFromContext(r)
+
 	id, err := getId(r)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Error: "something went wrong",
+		})
+	}
+
+	todo, err := server.store.DB.FetchTodo(r.Context(), id)
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
+			Error: "can't fetch todo",
+		})
+	}
+
+	if todo.AuthorID != int32(userId) {
+		return WriteJSON(w, http.StatusForbidden, ApiError{
+			Error: "wrong user",
 		})
 	}
 
@@ -66,6 +83,8 @@ func (server *ApiServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request
 }
 
 func (server *ApiServer) handleUpdateTodo(w http.ResponseWriter, r *http.Request) error {
+	userId := getUserIdFromContext(r)
+
 	id, err := getId(r)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
@@ -87,6 +106,19 @@ func (server *ApiServer) handleUpdateTodo(w http.ResponseWriter, r *http.Request
 		})
 	}
 
+	todo, err := server.store.DB.FetchTodo(r.Context(), id)
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
+			Error: "can't fetch todo",
+		})
+	}
+
+	if todo.AuthorID != int32(userId) {
+		return WriteJSON(w, http.StatusForbidden, ApiError{
+			Error: "wrong user",
+		})
+	}
+
 	err = server.store.DB.UpdateTodo(r.Context(), database.UpdateTodoParams{ID: id, Text: params.Text, Completed: params.Completed})
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
@@ -100,6 +132,8 @@ func (server *ApiServer) handleUpdateTodo(w http.ResponseWriter, r *http.Request
 }
 
 func (server *ApiServer) handleFetchTodoById(w http.ResponseWriter, r *http.Request) error {
+	userId := getUserIdFromContext(r)
+
 	id, err := getId(r)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
@@ -111,6 +145,12 @@ func (server *ApiServer) handleFetchTodoById(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
 			Error: "something went wrong",
+		})
+	}
+
+	if todo.AuthorID != int32(userId) {
+		return WriteJSON(w, http.StatusForbidden, ApiError{
+			Error: "wrong user",
 		})
 	}
 
