@@ -11,7 +11,7 @@ func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
 		err := f(w, r)
 		if err != nil {
 			WriteJSON(w, http.StatusBadRequest, ApiError{
-				Message: "something went wrong",
+				Error: "something went wrong",
 			})
 		}
 	}
@@ -29,4 +29,12 @@ func getId(r *http.Request) (int32, error) {
 
 func createUrl(method string, path string) string {
 	return fmt.Sprintf("%v %v%v", method, BASE_URL, path)
+}
+
+func getUserIdFromContext(r *http.Request) int {
+	ctx := r.Context()
+
+	userId := ctx.Value(ctxKeyRequestID)
+
+	return userId.(int)
 }

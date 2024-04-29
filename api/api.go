@@ -12,8 +12,8 @@ type ApiServer struct {
 }
 
 type ApiError struct {
-	Message string `json:"message"`
-	Code    string `json:"code"`
+	Error string `json:"message"`
+	Code  string `json:"code"`
 }
 
 type ApiGenericResponse struct {
@@ -49,6 +49,7 @@ func (server *ApiServer) Run() {
 	// auth
 	router.HandleFunc(createUrl(http.MethodPost, "/auth/register"), makeHTTPHandleFunc(server.handleUserRegister))
 	router.HandleFunc(createUrl(http.MethodPost, "/auth/login"), makeHTTPHandleFunc(server.handleUserLogin))
+	router.HandleFunc(createUrl(http.MethodGet, "/auth/me"), authMiddleware(makeHTTPHandleFunc(server.handleFetchMe)))
 
 	http.ListenAndServe(":"+server.addr, handler)
 }

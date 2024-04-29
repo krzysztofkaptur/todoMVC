@@ -9,6 +9,22 @@ import (
 	"context"
 )
 
+const fetchMe = `-- name: FetchMe :one
+select id, email from users where id=$1
+`
+
+type FetchMeRow struct {
+	ID    int32  `json:"id"`
+	Email string `json:"email"`
+}
+
+func (q *Queries) FetchMe(ctx context.Context, id int32) (FetchMeRow, error) {
+	row := q.db.QueryRowContext(ctx, fetchMe, id)
+	var i FetchMeRow
+	err := row.Scan(&i.ID, &i.Email)
+	return i, err
+}
+
 const registerUser = `-- name: RegisterUser :exec
 insert into users (email, password) values ($1, $2)
 `

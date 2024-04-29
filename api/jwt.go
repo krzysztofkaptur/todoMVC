@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -16,7 +18,7 @@ func createToken(id int32) (string, error) {
 	claims := MyCustomClaims{
 		id,
 		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Second)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	}
 
@@ -28,4 +30,33 @@ func createToken(id int32) (string, error) {
 	}
 
 	return tokenStr, err
+}
+
+func VerifyJWT(tokenString string) (*jwt.Token, error) {
+	secret := os.Getenv("JWT_SECRET")
+
+	return jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return []byte(secret), nil
+	})
+}
+
+func GetUserIdFromToken(r *http.Request) (int, error) {
+	authToken := r.Header.Get("authorization")
+
+	token, err := VerifyJWT(authToken)
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+
+	claims := token.Claims.(jwt.MapClaims)
+
+	userIdStr := claims["Id"].(float64)
+	userId := int(userIdStr)
+
+	return userId, nil
 }

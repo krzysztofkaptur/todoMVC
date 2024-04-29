@@ -9,25 +9,25 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (server *ApiServer) handleUserRegister(w http.ResponseWriter, r *http.Request) error {
-	type parameters struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+type Account struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
 
-	params := parameters{}
+func (server *ApiServer) handleUserRegister(w http.ResponseWriter, r *http.Request) error {
+	params := Account{}
 
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
-			Message: "something went wrong with decoding",
+			Error: "something went wrong with decoding",
 		})
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), 10)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
-			Message: "something went wrong with hashing",
+			Error: "something went wrong with hashing",
 		})
 	}
 
@@ -35,7 +35,7 @@ func (server *ApiServer) handleUserRegister(w http.ResponseWriter, r *http.Reque
 	fmt.Println(err)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
-			Message: "something went wrong with creating a user",
+			Error: "something went wrong with creating a user",
 		})
 	}
 
@@ -43,38 +43,33 @@ func (server *ApiServer) handleUserRegister(w http.ResponseWriter, r *http.Reque
 }
 
 func (server *ApiServer) handleUserLogin(w http.ResponseWriter, r *http.Request) error {
-	type parameters struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	params := parameters{}
+	params := Account{}
 
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
-			Message: "something went wrong with json decoder",
+			Error: "something went wrong with json decoder",
 		})
 	}
 
 	user, err := server.store.DB.FetchUserByEmail(r.Context(), params.Email)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
-			Message: "something went wrong with getting user from db",
+			Error: "something went wrong with getting user from db",
 		})
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(params.Password))
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
-			Message: "wrong password",
+			Error: "wrong password",
 		})
 	}
 
 	token, err := createToken(user.ID)
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, ApiError{
-			Message: "problem with token creation",
+			Error: "problem with token creation",
 		})
 	}
 
@@ -85,4 +80,17 @@ func (server *ApiServer) handleUserLogin(w http.ResponseWriter, r *http.Request)
 	return WriteJSON(w, http.StatusOK, loginResponse{
 		AccessToken: token,
 	})
+}
+
+func (server *ApiServer) handleFetchMe(w http.ResponseWriter, r *http.Request) error {
+	userId := getUserIdFromContext(r)
+
+	user, err := server.store.DB.FetchMe(r.Context(), int32(userId))
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, ApiError{
+			Error: "problem with fetching me from db",
+		})
+	}
+
+	return WriteJSON(w, http.StatusOK, user)
 }
