@@ -10,8 +10,10 @@ export const fetchTodos = (cookie: string) =>
     },
   }).then((res) => {
     if (res.ok) {
+      console.log(res);
       return res.json();
     }
+    console.log("not okay");
 
     return Promise.reject();
   });

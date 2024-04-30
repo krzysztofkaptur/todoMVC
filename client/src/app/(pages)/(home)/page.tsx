@@ -18,7 +18,8 @@ export default async function Home() {
     <main className="m-auto max-w-md">
       <CreateTodoForm />
       <section>
-        {todos?.map((todo) => <TodoItem key={todo.id} todo={todo} />)}
+        {Array.isArray(todos) &&
+          todos?.map((todo) => <TodoItem key={todo.id} todo={todo} />)}
       </section>
     </main>
   );

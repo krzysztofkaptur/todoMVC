@@ -77,9 +77,9 @@ func (server *ApiServer) handleUserLogin(w http.ResponseWriter, r *http.Request)
 		Name:     "accessToken",
 		Value:    token,
 		Path:     "/",
-		MaxAge:   86400,
 		HttpOnly: true,
 		Secure:   true,
+		Expires:  expTime,
 		SameSite: http.SameSiteNoneMode,
 	}
 

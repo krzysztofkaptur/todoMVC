@@ -9,6 +9,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var expTime = time.Now().Add(24 * time.Hour)
+
 type MyCustomClaims struct {
 	Id int32
 	jwt.RegisteredClaims
@@ -18,7 +20,7 @@ func createToken(id int32) (string, error) {
 	claims := MyCustomClaims{
 		id,
 		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(expTime),
 		},
 	}
 
