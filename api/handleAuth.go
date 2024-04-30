@@ -86,7 +86,7 @@ func (server *ApiServer) handleUserLogin(w http.ResponseWriter, r *http.Request)
 	http.SetCookie(w, &cookie)
 
 	return WriteJSON(w, http.StatusOK, ApiGenericResponse{
-		Message: "loged in successfully",
+		Message: "logged in successfully",
 	})
 }
 
@@ -101,4 +101,21 @@ func (server *ApiServer) handleFetchMe(w http.ResponseWriter, r *http.Request) e
 	}
 
 	return WriteJSON(w, http.StatusOK, user)
+}
+
+func (server *ApiServer) handleLogout(w http.ResponseWriter, r *http.Request) error {
+	cookie := http.Cookie{
+		Name:     "accessToken",
+		Path:     "/",
+		MaxAge:   0,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	}
+
+	http.SetCookie(w, &cookie)
+
+	return WriteJSON(w, http.StatusOK, ApiGenericResponse{
+		Message: "logged out",
+	})
 }

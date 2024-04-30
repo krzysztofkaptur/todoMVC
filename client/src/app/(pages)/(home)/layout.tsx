@@ -6,6 +6,7 @@ import { Nav } from "@/app/components/nav";
 import { fetchMe } from "@/app/services/auth";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,13 +22,18 @@ export default async function RootLayout({
 }>) {
   const cookieStore = cookies();
   const accessTokenCookie = cookieStore.get("accessToken");
+
+  if (!accessTokenCookie) {
+    redirect("/auth/login");
+  }
+
   const meRes = await fetchMe(accessTokenCookie?.value);
   const me = await meRes.json();
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Nav user={me} />
+        <Nav user={me} cookie={accessTokenCookie?.value} />
         {children}
       </body>
     </html>

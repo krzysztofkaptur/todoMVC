@@ -8,7 +8,13 @@ export const fetchTodos = (cookie: string) =>
     headers: {
       Cookie: `accessToken=${cookie}`,
     },
-  }).then((res) => res.json());
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+
+    return Promise.reject();
+  });
 
 export const createTodo = (body: CreateTodo) =>
   fetch(baseURL, {

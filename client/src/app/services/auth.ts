@@ -1,5 +1,4 @@
 import { baseURL } from "@/app/config/defaults";
-import { redirect } from "next/navigation";
 
 type RegisterUserBody = {
   email: string;
@@ -15,10 +14,10 @@ export const registerUser = (body: RegisterUserBody) =>
   fetch(`${baseURL}/auth/register`, {
     method: "POST",
     body: JSON.stringify(body),
-  });
+  }).then((res) => res.json());
 
 export const loginUser = (body: LoginUserBody) =>
-  fetch(`${baseURL}/auth/login`, {
+  fetch(`http://localhost/api/v1/auth/login`, {
     method: "POST",
     body: JSON.stringify(body),
     credentials: "include",
@@ -44,5 +43,22 @@ export const fetchMe = (cookie: string | undefined) => {
     });
   }
 
-  return redirect("/auth/login");
+  return Promise.reject();
 };
+
+export const logout = (cookie: string) =>
+  fetch(`http://localhost:3000/api/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Cookie: `accessToken=${cookie}`,
+    },
+  }).then((res) => {
+    if (!res.ok) {
+      return Promise.reject();
+    }
+
+    return res.json();
+  });

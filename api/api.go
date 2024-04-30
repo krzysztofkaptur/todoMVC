@@ -50,6 +50,7 @@ func (server *ApiServer) Run() {
 	router.HandleFunc(createUrl(http.MethodPost, "/auth/register"), makeHTTPHandleFunc(server.handleUserRegister))
 	router.HandleFunc(createUrl(http.MethodPost, "/auth/login"), makeHTTPHandleFunc(server.handleUserLogin))
 	router.HandleFunc(createUrl(http.MethodGet, "/auth/me"), authMiddleware(makeHTTPHandleFunc(server.handleFetchMe)))
+	router.HandleFunc(createUrl(http.MethodPost, "/auth/logout"), authMiddleware(makeHTTPHandleFunc(server.handleLogout)))
 
 	http.ListenAndServe(":"+server.addr, handler)
 }
