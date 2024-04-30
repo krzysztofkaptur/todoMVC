@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/krzysztofkaptur/todoMVC/internals/database"
@@ -10,7 +9,6 @@ import (
 
 func (server *ApiServer) handleFetchTodos(w http.ResponseWriter, r *http.Request) error {
 	userId := getUserIdFromContext(r)
-	fmt.Println("dupa ", userId)
 
 	todos, err := server.store.DB.FetchTodos(r.Context(), int32(userId))
 	if err != nil {

@@ -31,7 +31,7 @@ const (
 func (server *ApiServer) Run() {
 	router := http.NewServeMux()
 	handler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch},
 		AllowCredentials: true,
 	}).Handler(router)
