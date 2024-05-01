@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
 
 import { registerUser } from "@/app/services/auth";
 import { Button } from "@/app/components/ui/button";
@@ -10,6 +11,8 @@ import { registerSchema } from "@/app/libs/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/app/components/form";
 import { InputGroup } from "@/app/components/inputGroup";
+
+import type { RegisterUserBody } from "@/app/services/auth";
 
 export const RegisterForm = () => {
   const {
@@ -21,22 +24,23 @@ export const RegisterForm = () => {
   });
   const router = useRouter();
 
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      await registerUser({
-        email: values.email,
-        password: values.password,
-      });
-
+  const { mutate: registerMutation, isPending } = useMutation({
+    mutationFn: (body: RegisterUserBody) => registerUser(body),
+    onSuccess: () => {
       router.push("/auth/login");
-    } catch (err) {
+    },
+    onError: (err) => {
       console.log(err);
-    }
+    },
+  });
+
+  const onSubmit = handleSubmit(async (values) => {
+    registerMutation({ email: values.email, password: values.password });
   });
 
   return (
     <Form onSubmit={onSubmit} className="flex flex-col">
-      <h1 className="text-4xl font-thin">Regiser</h1>
+      <h1 className="text-4xl font-thin">Register</h1>
       <InputGroup
         label="Email"
         error={errors.email?.message as string}
@@ -51,7 +55,9 @@ export const RegisterForm = () => {
         type="password"
         {...register("password")}
       />
-      <Button type="submit">Register</Button>
+      <Button isLoading={isPending} type="submit">
+        Register
+      </Button>
       <p>
         Already have an account? <Link href="/auth/login">Login</Link>
       </p>

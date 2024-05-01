@@ -31,11 +31,9 @@ export default async function RootLayout({
   const me = await meRes.json();
 
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Nav user={me} cookie={accessTokenCookie?.value} />
-        <main className="m-auto mt-4 max-w-md p-4">{children}</main>
-      </body>
-    </html>
+    <main>
+      <Nav user={me} cookie={accessTokenCookie?.value} />
+      <div className="m-auto mt-4 max-w-md p-4">{children}</div>
+    </main>
   );
 }

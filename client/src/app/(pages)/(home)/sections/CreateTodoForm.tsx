@@ -3,14 +3,15 @@
 import { FieldValues, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 
 import { createTodo } from "@/app/services/todos";
 import { addTodoSchema } from "@/app/libs/validation";
 import { Button } from "@/app/components/ui/button";
 import { Form } from "@/app/components/form";
 import { InputGroup } from "@/app/components/inputGroup";
-import { Icon } from "@/app/components/icon";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { CreateTodo } from "@/app/components/todo/types";
 
 export const CreateTodoForm = () => {
   const router = useRouter();
@@ -24,15 +25,23 @@ export const CreateTodoForm = () => {
     resolver: zodResolver(addTodoSchema),
   });
 
+  const { mutate: createTodoMutation, isPending: isCreateTodoPending } =
+    useMutation({
+      mutationFn: (body: CreateTodo) => createTodo(body),
+      onSuccess: () => {
+        reset();
+        router.refresh();
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+    });
+
   const onSubmit = handleSubmit(async (values: FieldValues) => {
-    await createTodo({
+    createTodoMutation({
       text: values.text,
       completed: false,
     });
-
-    reset();
-
-    router.refresh();
   });
 
   return (
@@ -41,8 +50,8 @@ export const CreateTodoForm = () => {
         {...register("text")}
         error={errors.text?.message as string}
       />
-      <Button type="submit">
-        <Icon icon={faPlus} />
+      <Button isLoading={isCreateTodoPending} type="submit">
+        <Plus className="h-4 w-4" />
       </Button>
     </Form>
   );

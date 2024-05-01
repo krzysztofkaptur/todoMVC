@@ -10,11 +10,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="en">
-      <body>
-        <main className="m-auto mt-4 max-w-md p-4">{children}</main>
-      </body>
-    </html>
-  );
+  return <main className="m-auto mt-4 max-w-md p-4">{children}</main>;
 }

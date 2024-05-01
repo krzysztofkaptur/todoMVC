@@ -1,11 +1,11 @@
 import { baseURL } from "@/app/config/defaults";
 
-type RegisterUserBody = {
+export type RegisterUserBody = {
   email: string;
   password: string;
 };
 
-type LoginUserBody = {
+export type LoginUserBody = {
   email: string;
   password: string;
 };

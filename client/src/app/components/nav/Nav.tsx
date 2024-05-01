@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import { logout } from "@/app/services/auth";
-import { useRouter } from "next/navigation";
 import { Button } from "@/app/components/ui/button";
 
 type Props = {
@@ -18,14 +19,19 @@ export const Nav = (props: Props) => {
   const { user, cookie } = props;
   const router = useRouter();
 
+  const { mutate: logoutMutation, isPending: isLogoutLoading } = useMutation({
+    mutationFn: (cookie: string) => logout(cookie),
+    onSuccess: () => {
+      router.push("/auth/login");
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
   const handleLogout = async () => {
     if (cookie) {
-      try {
-        await logout(cookie);
-        router.push("/auth/login");
-      } catch (err) {
-        console.log(err);
-      }
+      logoutMutation(cookie);
     }
   };
 
@@ -35,7 +41,11 @@ export const Nav = (props: Props) => {
         {user?.id ? (
           <div className="flex w-full items-center justify-end gap-2">
             <span>{user?.email}</span>
-            <Button variant="outline" onClick={handleLogout}>
+            <Button
+              isLoading={isLogoutLoading}
+              variant="outline"
+              onClick={handleLogout}
+            >
               Logout
             </Button>
           </div>
