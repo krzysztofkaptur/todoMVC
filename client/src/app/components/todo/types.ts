@@ -5,4 +5,4 @@ export type Todo = {
   author_id: number;
 };
 
-export type CreateTodo = Omit<Todo, "id">;
+export type CreateTodo = Omit<Todo, "id" | "author_id">;

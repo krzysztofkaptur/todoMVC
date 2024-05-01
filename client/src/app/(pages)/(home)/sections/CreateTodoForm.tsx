@@ -9,6 +9,8 @@ import { addTodoSchema } from "@/app/libs/validation";
 import { Button } from "@/app/components/button";
 import { Form } from "@/app/components/form";
 import { InputGroup } from "@/app/components/inputGroup";
+import { Icon } from "@/app/components/icon";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 export const CreateTodoForm = () => {
   const router = useRouter();
@@ -39,7 +41,9 @@ export const CreateTodoForm = () => {
         {...register("text")}
         error={errors.text?.message as string}
       />
-      <Button type="submit">Add</Button>
+      <Button type="submit">
+        <Icon icon={faPlus} />
+      </Button>
     </Form>
   );
 };

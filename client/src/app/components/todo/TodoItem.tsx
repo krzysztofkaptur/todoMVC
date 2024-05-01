@@ -10,6 +10,14 @@ import { addTodoSchema } from "@/app/libs/validation";
 import { Button } from "@/app/components/button";
 import { InputGroup } from "@/app/components/inputGroup";
 import { Form } from "@/app/components/form";
+import { Icon } from "@/app/components/icon";
+
+import {
+  faTrashCan,
+  faPencil,
+  faXmark,
+  faCheck,
+} from "@fortawesome/free-solid-svg-icons";
 
 import type { Todo } from "./types";
 
@@ -93,8 +101,12 @@ export const TodoItem = ({ todo }: Props) => {
             />
           </div>
           <div className="flex gap-4">
-            <Button onClick={() => handleEditMode(false)}>Cancel</Button>
-            <Button type="submit">Save</Button>
+            <Button onClick={() => handleEditMode(false)}>
+              <Icon icon={faXmark} />
+            </Button>
+            <Button type="submit">
+              <Icon icon={faCheck} />
+            </Button>
           </div>
         </Form>
       ) : (
@@ -108,8 +120,12 @@ export const TodoItem = ({ todo }: Props) => {
             <span>{todo.text}</span>
           </div>
           <div className="flex gap-4">
-            <Button onClick={() => handleEditMode(true)}>Edit</Button>
-            <Button onClick={handleDelete}>Delete</Button>
+            <Button onClick={() => handleEditMode(true)}>
+              <Icon icon={faPencil} />
+            </Button>
+            <Button onClick={handleDelete}>
+              <Icon icon={faTrashCan} />
+            </Button>
           </div>
         </div>
       )}
