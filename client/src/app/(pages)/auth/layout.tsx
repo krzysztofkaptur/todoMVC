@@ -12,7 +12,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <main className="m-auto mt-4 max-w-md p-4">{children}</main>
+      </body>
     </html>
   );
 }

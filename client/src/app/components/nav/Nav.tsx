@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { logout } from "@/app/services/auth";
 import { useRouter } from "next/navigation";
+import { Button } from "@/app/components/ui/button";
 
 type Props = {
   user: {
@@ -29,18 +30,22 @@ export const Nav = (props: Props) => {
   };
 
   return (
-    <nav className="flex gap-4">
-      {user?.id ? (
-        <>
-          <span>{user?.email}</span>
-          <button onClick={handleLogout}>Logout</button>
-        </>
-      ) : (
-        <>
-          <Link href="/auth/login">Login</Link>
-          <Link href="/auth/register">Register</Link>
-        </>
-      )}
-    </nav>
+    <div className="shadow-sm">
+      <nav className="m-auto flex max-w-md items-center gap-4 p-4">
+        {user?.id ? (
+          <div className="flex w-full items-center justify-end gap-2">
+            <span>{user?.email}</span>
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Link href="/auth/login">Login</Link>
+            <Link href="/auth/register">Register</Link>
+          </div>
+        )}
+      </nav>
+    </div>
   );
 };

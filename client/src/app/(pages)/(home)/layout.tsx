@@ -34,7 +34,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Nav user={me} cookie={accessTokenCookie?.value} />
-        {children}
+        <main className="m-auto mt-4 max-w-md p-4">{children}</main>
       </body>
     </html>
   );

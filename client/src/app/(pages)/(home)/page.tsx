@@ -15,12 +15,13 @@ export default async function Home() {
   const todos: Todo[] = await fetchTodos(accessTokenCookie!.value);
 
   return (
-    <main className="m-auto max-w-md">
+    <>
       <CreateTodoForm />
+
       <section>
         {Array.isArray(todos) &&
           todos?.map((todo) => <TodoItem key={todo.id} todo={todo} />)}
       </section>
-    </main>
+    </>
   );
 }

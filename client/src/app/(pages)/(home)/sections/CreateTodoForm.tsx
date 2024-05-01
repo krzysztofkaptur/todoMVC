@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { createTodo } from "@/app/services/todos";
 import { addTodoSchema } from "@/app/libs/validation";
-import { Button } from "@/app/components/button";
+import { Button } from "@/app/components/ui/button";
 import { Form } from "@/app/components/form";
 import { InputGroup } from "@/app/components/inputGroup";
 import { Icon } from "@/app/components/icon";
@@ -36,7 +36,7 @@ export const CreateTodoForm = () => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit} className="justify-between">
       <InputGroup
         {...register("text")}
         error={errors.text?.message as string}

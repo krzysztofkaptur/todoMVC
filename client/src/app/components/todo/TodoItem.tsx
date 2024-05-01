@@ -7,10 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { deleteTodo, updateTodo } from "@/app/services/todos";
 import { addTodoSchema } from "@/app/libs/validation";
-import { Button } from "@/app/components/button";
+import { Button } from "@/app/components/ui/button";
 import { InputGroup } from "@/app/components/inputGroup";
 import { Form } from "@/app/components/form";
 import { Icon } from "@/app/components/icon";
+import { Checkbox } from "@/app/components/ui/checkbox";
 
 import {
   faTrashCan,
@@ -87,43 +88,42 @@ export const TodoItem = ({ todo }: Props) => {
   }, [todo, setValue]);
 
   return (
-    <article>
+    <article className="shadow-md">
       {editMode ? (
         <Form
           onSubmit={handleUpdate}
           className="m-4 flex justify-between gap-4 p-4"
         >
-          <div className="flex gap-4">
-            <input type="checkbox" disabled checked={todo.completed} />
+          <div className="flex items-center gap-4">
+            <Checkbox disabled checked={todo.completed} />
             <InputGroup
               {...register("text")}
               error={errors.text?.message as string}
             />
           </div>
           <div className="flex gap-4">
-            <Button onClick={() => handleEditMode(false)}>
+            <Button variant="outline" onClick={() => handleEditMode(false)}>
               <Icon icon={faXmark} />
             </Button>
-            <Button type="submit">
+            <Button variant="outline" type="submit">
               <Icon icon={faCheck} />
             </Button>
           </div>
         </Form>
       ) : (
         <div className="m-4 flex justify-between gap-4 p-4">
-          <div className="flex gap-4">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-4">
+            <Checkbox
               checked={todo.completed}
-              onChange={handleCheckbox}
+              onCheckedChange={handleCheckbox}
             />
             <span>{todo.text}</span>
           </div>
           <div className="flex gap-4">
-            <Button onClick={() => handleEditMode(true)}>
+            <Button variant="outline" onClick={() => handleEditMode(true)}>
               <Icon icon={faPencil} />
             </Button>
-            <Button onClick={handleDelete}>
+            <Button variant="destructive" onClick={handleDelete}>
               <Icon icon={faTrashCan} />
             </Button>
           </div>

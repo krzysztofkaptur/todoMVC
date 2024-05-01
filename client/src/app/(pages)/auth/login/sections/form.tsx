@@ -2,9 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { loginUser } from "@/app/services/auth";
-import { Button } from "@/app/components/button";
+import { Button } from "@/app/components/ui/button";
 import { loginSchema } from "@/app/libs/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/app/components/form";
@@ -35,6 +36,7 @@ export const LoginForm = () => {
 
   return (
     <Form onSubmit={onSubmit} className="flex flex-col">
+      <h1 className="text-4xl font-thin">Login</h1>
       <InputGroup
         label="Email"
         error={errors.email?.message as string}
@@ -50,6 +52,9 @@ export const LoginForm = () => {
         {...register("password")}
       />
       <Button type="submit">Login</Button>
+      <p>
+        Don&apos;t have an account? <Link href="/auth/register">Register</Link>
+      </p>
     </Form>
   );
 };
