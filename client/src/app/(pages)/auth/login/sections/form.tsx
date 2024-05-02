@@ -40,7 +40,7 @@ export const LoginForm = () => {
 
   return (
     <Form onSubmit={onSubmit} className="flex flex-col">
-      <h1 className="text-4xl font-thin">Login</h1>
+      <h1 className="text-4xl font-extralight">Login</h1>
       <InputGroup
         label="Email"
         error={errors.email?.message as string}

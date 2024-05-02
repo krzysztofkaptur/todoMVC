@@ -40,7 +40,7 @@ export const RegisterForm = () => {
 
   return (
     <Form onSubmit={onSubmit} className="flex flex-col">
-      <h1 className="text-4xl font-thin">Register</h1>
+      <h1 className="text-4xl font-extralight">Register</h1>
       <InputGroup
         label="Email"
         error={errors.email?.message as string}

@@ -23,6 +23,7 @@ export const Nav = (props: Props) => {
     mutationFn: (cookie: string) => logout(cookie),
     onSuccess: () => {
       router.push("/auth/login");
+      router.refresh();
     },
     onError: (err) => {
       console.log(err);
